@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Shadow : MonoBehaviour {
+public class WallShadow : MonoBehaviour {
 	public Vector3 velocity;
 	
 	// Update is called once per frame

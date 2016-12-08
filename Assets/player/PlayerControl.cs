@@ -5,38 +5,43 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 public class PlayerControl : MonoBehaviour {
-	public GameObject attackPrefab;
+	public GameObject attackPrefab; //moving wall
 	public Material whiteMaterial;
 
-	Music music;
+	int number;
+	PlayerShadow shadow;
 	Transform attack;
 	new CircleCollider2D collider;
 	new SpriteRenderer renderer;
-	float speed = 2;
-	int number;
 	
 	void Start () {
-		attack = transform.GetChild(0);
 		number = Array.IndexOf(FindObjectsOfType<PlayerControl>(), this) + 1;
-		music = FindObjectOfType<Music>();
+
+		shadow = transform.GetChild(0).GetComponent<PlayerShadow>();
+		shadow.initialize(number);
+
+		attack = transform.GetChild(1);
+
 		collider = GetComponent<CircleCollider2D>();
 		renderer = GetComponent<SpriteRenderer>();
 	}
 	
 	void Update () {
-		// -- Movement --
-		Vector2 delta = new Vector2(Input.GetAxis("Horizontal"+number), Input.GetAxis("Vertical"+number)) * speed;
+		// -- Move Shadow --
+		Vector2 delta = new Vector2(Input.GetAxis("Controller"+number+"Stick1X"), Input.GetAxis("Controller"+number+"Stick1Y")) * collider.radius * 2;
 
-		attack.position = (Vector2)transform.position + delta;
+		shadow.transform.position = (Vector2)transform.position + delta;
 		
-		if (music.beat) {
-			// -- Attacks --
+		if (Music.beat) {
+			// -- Wall Attack --
 			if (Input.GetButton("Attack"+number)) {
 				Projectile projectile = ((GameObject)Instantiate(attackPrefab, transform.position, Quaternion.identity)).GetComponent<Projectile>();
 				projectile.initialize(delta.normalized * 4, number, renderer.color);
 			}
 
+			// -- Circle Attack --
 			transform.position += (Vector3)delta;
+			attack.localPosition = shadow.attackPosDelta;
 
 			// -- Collision --
 			int otherNumber = number == 1 ? 2 : 1;
@@ -51,10 +56,9 @@ public class PlayerControl : MonoBehaviour {
 				thisRenderer.color = Color.white;
 				otherRenderer.color = Color.white;
 
-				int deathCam = LayerMask.NameToLayer("DeathCam");
-
-				gameObject.layer = deathCam;
-				other.gameObject.layer = deathCam;
+				//only render these two
+				gameObject.layer = LayerMask.NameToLayer("DeathCam"); ;
+				other.gameObject.layer = LayerMask.NameToLayer("DeathCam");
 
 				Camera.main.backgroundColor = Color.black;
 				Camera.main.cullingMask = LayerMask.GetMask("DeathCam");

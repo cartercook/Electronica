@@ -3,19 +3,17 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class Projectile : MonoBehaviour {
-	Music music;
-	Shadow shadow;
+	WallShadow shadow;
 
 	void Update() {
-		if (music.beat) {
+		if (Music.beat) {
 			transform.position = shadow.transform.position;
 			shadow.transform.localPosition = Vector2.zero;
 		}
 	}
 
 	public void initialize(Vector2 direction, int layer, Color color) {
-		music = FindObjectOfType<Music>();
-		shadow = transform.GetChild(0).GetComponent<Shadow>();
+		shadow = transform.GetChild(0).GetComponent<WallShadow>();
 
 		name = "P"+layer+" "+name;
 
