@@ -27,9 +27,11 @@ public class PlayerControl : MonoBehaviour {
 	}
 	
 	void Update () {
-		Debug.Log(name+".Update();");
 		// -- Move Shadow --
-		Vector2 leftStickDelta = new Vector2(Input.GetAxis("Controller"+number+"Stick1X"), Input.GetAxis("Controller"+number+"Stick1Y")) * collider.radius * 2;
+		Vector2 leftStickDelta = Vector2.ClampMagnitude(
+			new Vector2(Input.GetAxis("Controller"+number+"Stick1X"), Input.GetAxis("Controller"+number+"Stick1Y"))*collider.radius*2,
+			collider.radius*2
+		);
 		shadow.transform.position = (Vector2)transform.position + leftStickDelta;
 
 		Vector2 rightStickDelta = shadow.Update();
@@ -48,7 +50,6 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	void LateUpdate() {
-		Debug.Log(name+".LateUpdate();");
 		// -- Collision --
 		if (Music.beat) {
 			int otherNumber = number == 1 ? 2 : 1;

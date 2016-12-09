@@ -14,7 +14,10 @@ public class PlayerShadow : MonoBehaviour {
 	
 	//called by parent
 	public Vector2 Update() {
-		Vector2 rightStickDelta = new Vector2(Input.GetAxis("Controller"+number+"Stick2X"), Input.GetAxis("Controller"+number+"Stick2Y")) * attackRadius;
+		Vector2 rightStickDelta = Vector2.ClampMagnitude(
+			new Vector2(Input.GetAxis("Controller"+number+"Stick2X"), Input.GetAxis("Controller"+number+"Stick2Y"))*attackRadius,
+			attackRadius
+		);
 
 		attackShadow.position = (Vector2)transform.position + rightStickDelta;
 
