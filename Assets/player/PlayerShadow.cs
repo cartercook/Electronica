@@ -2,25 +2,23 @@
 using System.Collections;
 
 public class PlayerShadow : MonoBehaviour {
-	public Vector2 attackPosDelta;
-
-	Transform attack;
+	Transform attackShadow;
 	float attackRadius;
 	int number;
 
-	// Use this for initialization
 	public void initialize(int number) {
-		attack = transform.GetChild(0);
-		attackRadius = attack.GetComponent<SpriteRenderer>().bounds.extents.x;
+		attackShadow = transform.GetChild(0);
+		attackRadius = attackShadow.GetComponent<SpriteRenderer>().bounds.size.x;
 		this.number = number;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		// -- Movement --
-		attackPosDelta = new Vector2(Input.GetAxis("Controller"+number+"Stick2X"), Input.GetAxis("Controller"+number+"Stick2Y")) * attackRadius;
+	//called by parent
+	public Vector2 Update() {
+		Vector2 rightStickDelta = new Vector2(Input.GetAxis("Controller"+number+"Stick2X"), Input.GetAxis("Controller"+number+"Stick2Y")) * attackRadius;
 
-		attack.position = (Vector2)transform.position + attackPosDelta;
+		attackShadow.position = (Vector2)transform.position + rightStickDelta;
+
+		return rightStickDelta;
 	}
 
 

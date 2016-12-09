@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerControl : MonoBehaviour {
 	public GameObject attackPrefab; //moving wall
-	public Material whiteMaterial;
+	public Material SolidColour;
 
 	int number;
 	PlayerShadow shadow;
@@ -27,41 +27,48 @@ public class PlayerControl : MonoBehaviour {
 	}
 	
 	void Update () {
+		Debug.Log(name+".Update();");
 		// -- Move Shadow --
-		Vector2 delta = new Vector2(Input.GetAxis("Controller"+number+"Stick1X"), Input.GetAxis("Controller"+number+"Stick1Y")) * collider.radius * 2;
+		Vector2 leftStickDelta = new Vector2(Input.GetAxis("Controller"+number+"Stick1X"), Input.GetAxis("Controller"+number+"Stick1Y")) * collider.radius * 2;
+		shadow.transform.position = (Vector2)transform.position + leftStickDelta;
 
-		shadow.transform.position = (Vector2)transform.position + delta;
-		
+		Vector2 rightStickDelta = shadow.Update();
+
 		if (Music.beat) {
 			// -- Wall Attack --
 			if (Input.GetButton("Attack"+number)) {
 				Projectile projectile = ((GameObject)Instantiate(attackPrefab, transform.position, Quaternion.identity)).GetComponent<Projectile>();
-				projectile.initialize(delta.normalized * 4, number, renderer.color);
+				projectile.initialize(rightStickDelta.normalized * 4, number, renderer.color);
 			}
 
 			// -- Circle Attack --
-			transform.position += (Vector3)delta;
-			attack.localPosition = shadow.attackPosDelta;
+			transform.position += (Vector3)leftStickDelta;
+			attack.localPosition = rightStickDelta;
+		}
+	}
 
-			// -- Collision --
+	void LateUpdate() {
+		Debug.Log(name+".LateUpdate();");
+		// -- Collision --
+		if (Music.beat) {
 			int otherNumber = number == 1 ? 2 : 1;
 			Collider2D other = Physics2D.OverlapCircle(transform.position, collider.radius, LayerMask.GetMask("P"+otherNumber+"Projectile"));
 			if (other != null) {
 				Debug.Log(name+" hit "+other.name);
 
+				//colour white
 				SpriteRenderer thisRenderer = GetComponent<SpriteRenderer>();
 				SpriteRenderer otherRenderer = other.GetComponent<SpriteRenderer>();
-				thisRenderer.material = whiteMaterial;
-				otherRenderer.material = whiteMaterial;
-				thisRenderer.color = Color.white;
-				otherRenderer.color = Color.white;
+				thisRenderer.material = SolidColour;
+				otherRenderer.material = SolidColour;
 
 				//only render these two
-				gameObject.layer = LayerMask.NameToLayer("DeathCam"); ;
+				gameObject.layer = LayerMask.NameToLayer("DeathCam");
 				other.gameObject.layer = LayerMask.NameToLayer("DeathCam");
-
-				Camera.main.backgroundColor = Color.black;
 				Camera.main.cullingMask = LayerMask.GetMask("DeathCam");
+
+				//black background
+				Camera.main.backgroundColor = Color.black;
 
 				Time.timeScale = 0; //pause game
 				StartCoroutine(twoSecondReset()); //wait 2 seconds and reset

@@ -14,6 +14,8 @@ public class Music : MonoBehaviour {
 		audio = GetComponent<AudioSource>();
 	}
 
+	//NOTE: executes before all other Update functions since
+	//Music is set in Project Settings -> Script Execution Order 
 	void Update () {
 		if (counter > 1) {
 			counter -= 1;
