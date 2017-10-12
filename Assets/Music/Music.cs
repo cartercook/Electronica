@@ -2,9 +2,10 @@
 using System.Collections;
 
 public class Music : MonoBehaviour {
+	public const float BPS = 1;
 	
 	public static bool beat {
-		get { return counter > 1; }
+		get { return counter > BPS; }
 	}
 
 	static float counter = 0;
@@ -17,8 +18,8 @@ public class Music : MonoBehaviour {
 	//NOTE: executes before all other Update functions since
 	//Music is set in Project Settings -> Script Execution Order 
 	void Update () {
-		if (counter > 1) {
-			counter -= 1;
+		if (counter > BPS) {
+			counter -= BPS;
 		}
 
 		counter += Time.deltaTime;

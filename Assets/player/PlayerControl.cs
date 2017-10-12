@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using XboxCtrlrInput;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,7 +30,10 @@ public class PlayerControl : MonoBehaviour {
 	void Update () {
 		// -- Move Shadow --
 		Vector2 leftStickDelta = Vector2.ClampMagnitude(
-			new Vector2(Input.GetAxis("Controller"+number+"Stick1X"), Input.GetAxis("Controller"+number+"Stick1Y"))*collider.radius*2,
+			new Vector2(
+				InputManager.getAxis(XboxAxis.LeftStickX, (XboxController)number),
+				InputManager.getAxis(XboxAxis.LeftStickY, (XboxController)number)
+			)*collider.radius*2,
 			collider.radius*2
 		);
 		shadow.transform.position = (Vector2)transform.position + leftStickDelta;
@@ -38,14 +42,30 @@ public class PlayerControl : MonoBehaviour {
 
 		if (Music.beat) {
 			// -- Wall Attack --
-			if (Input.GetButton("Attack"+number)) {
-				Projectile projectile = ((GameObject)Instantiate(attackPrefab, transform.position, Quaternion.identity)).GetComponent<Projectile>();
+			Boolean attackPressed = false;
+			switch (number) {
+				case 1:
+					attackPressed = Input.GetKey(KeyCode.Space);
+					break;
+				case 2:
+					attackPressed = Input.GetKey(KeyCode.Keypad0);
+					break;
+			}
+			attackPressed = attackPrefab || XCI.GetButton(XboxButton.RightBumper, (XboxController)number);
+
+			if (attackPressed && rightStickDelta.magnitude > 0.5) {
+				Projectile projectile = Instantiate(attackPrefab, transform.position, Quaternion.identity).GetComponent<Projectile>();
 				projectile.initialize(rightStickDelta.normalized * 4, number, renderer.color);
 			}
 
 			// -- Circle Attack --
 			transform.position += (Vector3)leftStickDelta;
 			attack.localPosition = rightStickDelta;
+
+			// -- Lazer Attack --
+			if (rightStickDelta.magnitude > 0.5 && XCI.GetButton(XboxButton.LeftBumper, (XboxController)number)) {
+				
+			}
 		}
 	}
 

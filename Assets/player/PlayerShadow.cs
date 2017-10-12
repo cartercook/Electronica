@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using XboxCtrlrInput;
 using System.Collections;
 
 public class PlayerShadow : MonoBehaviour {
@@ -15,7 +16,10 @@ public class PlayerShadow : MonoBehaviour {
 	//called by parent
 	public Vector2 Update() {
 		Vector2 rightStickDelta = Vector2.ClampMagnitude(
-			new Vector2(Input.GetAxis("Controller"+number+"Stick2X"), Input.GetAxis("Controller"+number+"Stick2Y"))*attackRadius,
+			new Vector2(
+				InputManager.getAxis(XboxAxis.RightStickX, (XboxController)number),
+				InputManager.getAxis(XboxAxis.RightStickY, (XboxController)number)
+			)*attackRadius,
 			attackRadius
 		);
 
